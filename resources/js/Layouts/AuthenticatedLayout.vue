@@ -1,13 +1,18 @@
 <script setup>
-import { ref } from 'vue';
+import {ref} from 'vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import {Link, router, usePage} from '@inertiajs/vue3';
+import Toast from "@/Components/toast/Toast.vue";
 
 const showingNavigationDropdown = ref(false);
+const showingToast = ref(false)
+router.on('finish', () => {
+    showingToast.value = !!usePage().props.toast.message
+})
 </script>
 
 <template>
@@ -38,6 +43,22 @@ const showingNavigationDropdown = ref(false);
                                     :active="route().current('dashboard')"
                                 >
                                     Dashboard
+                                </NavLink>
+                            </div>
+                            <div
+                                class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
+                            >
+                                <NavLink
+                                    :href="route('products.index')"
+                                    :active="route().current('products.*')"
+                                >
+                                    Products
+                                </NavLink>
+                                <NavLink
+                                    :href="route('categories.index')"
+                                    :active="route().current('categories.*')"
+                                >
+                                    Categories
                                 </NavLink>
                             </div>
                         </div>
@@ -146,6 +167,12 @@ const showingNavigationDropdown = ref(false);
                         >
                             Dashboard
                         </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            :href="route('products.index')"
+                            :active="route().current('products.*')"
+                        >
+                            Products
+                        </ResponsiveNavLink>
                     </div>
 
                     <!-- Responsive Settings Options -->
@@ -185,14 +212,19 @@ const showingNavigationDropdown = ref(false);
                 v-if="$slots.header"
             >
                 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                    <slot name="header" />
+                    <slot name="header"/>
                 </div>
             </header>
 
             <!-- Page Content -->
             <main>
-                <slot />
+                <slot/>
             </main>
+            <Toast :message="$page.props.toast.message || '' "
+                   :show="showingToast"
+                   @hide="showingToast = false"
+                   type="success"
+                   position="bottom-right"/>
         </div>
     </div>
 </template>
